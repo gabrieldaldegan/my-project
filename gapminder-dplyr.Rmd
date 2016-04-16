@@ -1,0 +1,88 @@
+---
+title: "gapminder-analysis-dplyr.Rmd"
+author: "Gabriel Daldegan"
+date: "April 16, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installing and loading dplyr
+
+```{r }
+##install.packages('dplyr') # install dplyr package
+library(dplyr) # do this every time I restart R and need dplyr
+```
+
+## Load gapminder
+
+``` {r pressure, echo=FALSE}
+install.packages('gapminder')
+library(gapminder)
+str(gapminder)
+```
+
+## Eploration with gapminder
+
+``` {r}
+# simple filter example
+filter(gapminder, lifeExp < 29)
+filter(gapminder, country == 'Rwanda')
+# without dplyr
+subset(gapminder == 'Rwanda')
+a <- filter(gapminder, country %in% c('Rwanda', 'Afghanistan'))
+
+# compare without dplyr
+gapminder[gapminder$lifeExp < 29, ] # R's original way to subset data
+
+# the pipe operator %>% 
+# from magrittr package
+gapminder %>%  head
+
+gapminder %>% head(3)
+
+# subset with select()
+select(gapminder, year, lifeExp)
+
+gapminder %>% 
+  select(year, lifeExp) %>% 
+  head(4)
+
+# %>% takes whatever is on the left of the %>%  and passes it to whatever is on the right as the first argument (PIPE!!!). shortcut -> ctrl + shft + m
+
+gapminder %>% 
+  filter(country == "Cambodia") %>% 
+  # select(country, year, pop, gdpPercap)
+  select(-continent, -lifeExp)
+
+#original way to do it in R
+#gapminder[gapminder$country == "Cambodia", c('country', 'year', 'pop', 'gdpPercap')]
+
+# continue with mutate
+gapminder %>% 
+  mutate(gdp = pop * gdpPercap)
+
+# exercise
+# add mutate to our previous analysis
+
+gapminder %>% 
+  #filter(country == "Cambodia") %>% 
+  select(-continent, -lifeExp) %>% 
+  mutate(gdp = pop * gdpPercap) %>% 
+  group_by(country) %>% 
+  summarise(meanGDP = mean(gdp)) %>% 
+  ungroup()
+
+
+```
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
